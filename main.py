@@ -3,25 +3,25 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+
 class Msg(BaseModel):
     msg: str
 
 
+# define postgres connection
+db_vars = {
+    # nothing for now :(
+}
+
+
 @app.get("/")
 async def root():
-    return {"message": "Hello World. Welcome to FastAPI!"}
+    return {"message": "Hello, Chelsea. This is the default landing API. You don't want this..."}
 
 
-@app.get("/path")
-async def demo_get():
-    return {"message": "This is /path endpoint, use a post request to transform the text to uppercase"}
-
-
-@app.post("/path")
-async def demo_post(inp: Msg):
-    return {"message": inp.msg.upper()}
-
-
-@app.get("/path/{path_id}")
-async def demo_get_path_id(path_id: int):
-    return {"message": f"This is /path/{path_id} endpoint, use post request to retrieve result"}
+# setup an API endpoint that supplies a platform_item_id, and return the current_item_status, pilot_status, and item_writer
+@app.get("/api/v1/item_test/{platform_item_id}")
+async def item_details(platform_item_id: int):
+    # get from railway items table
+    item = await db.fetch_one(query="SELECT * FROM items WHERE platform_item_id = $1", values=[platform_item_id])
+    return {"current_item_status": item["current_item_status"], "pilot_status": item["pilot_status"], "item_writer": item["item_writer"]}
